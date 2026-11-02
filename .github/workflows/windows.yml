@@ -1,0 +1,64 @@
+name: Windows EXE
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıklar
+        run: |
+          python -m pip install --upgrade pip
+          pip install telethon pyinstaller
+
+      - name: Sürüm
+        id: ver
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v1.0.${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: EXE derle
+        run: >
+          pyinstaller --noconfirm --clean --onefile --windowed
+          --name UzdemIndirici
+          --collect-all telethon
+          --hidden-import telethon
+          uzdem_windows.py
+
+      - name: Artifact yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: UzdemIndirici-exe
+          path: dist/UzdemIndirici.exe
+
+      - name: Release oluştur
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: Uzdem Ders İndirici ${{ steps.ver.outputs.tag }}
+          body: |
+            Windows için tek dosya uygulama. İndir, çift tıkla, kurulum sihirbazını takip et.
+
+            Ek kurulum gerekmez (Python ve Telethon `.exe` içine gömülüdür).
+            SmartScreen uyarısı çıkarsa: **Ek bilgi → Yine de çalıştır**.
+          files: dist/UzdemIndirici.exe
+          draft: false
+          prerelease: false
