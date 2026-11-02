@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telegram API Alma Rehberi</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --kart: #ffffff;
+    --cizgi: #e3e8ee;
+    --metin: #1a2332;
+    --soluk: #5f6b7a;
+    --vurgu: #2b7de9;
+    --basari: #1a9d5c;
+    --uyari: #d98324;
+    --kod: #0e1621;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--metin);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 0 16px 80px;
+  }
+  .sinir { max-width: 780px; margin: 0 auto; }
+
+  header {
+    padding: 44px 0 28px;
+    border-bottom: 1px solid var(--cizgi);
+    margin-bottom: 32px;
+  }
+  header h1 {
+    font-size: 30px;
+    line-height: 1.25;
+    margin: 0 0 10px;
+    letter-spacing: -0.4px;
+  }
+  header p { margin: 0; color: var(--soluk); font-size: 16px; }
+  .rozetler { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .rozet {
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: #eaf1fc;
+    color: #1b5bb8;
+    font-weight: 500;
+  }
+  .rozet.yesil { background: #e6f6ed; color: #157a47; }
+
+  .on-bilgi {
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-left: 4px solid var(--vurgu);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 36px;
+  }
+  .on-bilgi strong { display: block; margin-bottom: 6px; }
+  .on-bilgi p { margin: 0; color: var(--soluk); font-size: 15px; }
+  .on-bilgi code {
+    background: #eef2f7; padding: 2px 6px; border-radius: 4px;
+    font-size: 14px; color: #24405e;
+  }
+
+  .adim {
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-radius: 12px;
+    padding: 26px 28px;
+    margin-bottom: 18px;
+    position: relative;
+    transition: box-shadow .2s;
+  }
+  .adim:hover { box-shadow: 0 4px 16px rgba(24,44,74,.07); }
+  .adim-baslik {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .numara {
+    flex: 0 0 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--vurgu);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .adim h2 {
+    font-size: 19px;
+    margin: 0;
+    letter-spacing: -0.2px;
+  }
+  .adim p { margin: 0 0 12px; }
+  .adim p:last-child { margin-bottom: 0; }
+
+  a { color: var(--vurgu); }
+  a.adres {
+    display: inline-block;
+    background: #eef4fd;
+    border: 1px solid #d3e2f8;
+    padding: 8px 14px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 6px 0;
+  }
+  a.adres:hover { background: #e2edfc; }
+
+  ol.alt, ul.alt { margin: 10px 0 12px; padding-left: 22px; }
+  ol.alt li, ul.alt li { margin-bottom: 8px; }
+  ol.alt li:last-child, ul.alt li:last-child { margin-bottom: 0; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #eef2f7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #24405e;
+  }
+
+  .kutu {
+    border-radius: 9px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 15px;
+  }
+  .kutu.uyari { background: #fdf4e7; border: 1px solid #f2dcb8; color: #7a4b0d; }
+  .kutu.basari { background: #e9f7f0; border: 1px solid #c4e8d6; color: #125c39; }
+  .kutu.bilgi { background: #eef4fd; border: 1px solid #d3e2f8; color: #1b4a85; }
+  .kutu strong { display: block; margin-bottom: 4px; }
+
+  .gorsel {
+    background: #f0f3f7;
+    border: 1px dashed #c9d3de;
+    border-radius: 9px;
+    padding: 16px;
+    margin: 14px 0;
+    font-size: 14px;
+    color: #4d5a68;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .gorsel .ekran {
+    background: #fff;
+    border: 1px solid #dde4ec;
+    border-radius: 7px;
+    padding: 14px 18px;
+    margin-top: 10px;
+    text-align: left;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: #26323f;
+  }
+  .gorsel .satir {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f3f7;
+  }
+  .gorsel .satir:last-child { border-bottom: 0; }
+  .gorsel .etiket { color: #7b8794; }
+  .gorsel .deger { font-weight: 600; color: #1a2332; }
+
+  .sonuc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0 4px;
+  }
+  .sonuc-kutu {
+    background: #0e1621;
+    border-radius: 9px;
+    padding: 14px 16px;
+    color: #fff;
+  }
+  .sonuc-kutu .ad {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #7d93ab;
+    margin-bottom: 4px;
+  }
+  .sonuc-kutu .veri {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px;
+    color: #7fd6a4;
+    word-break: break-all;
+  }
+  @media (max-width: 560px) {
+    .sonuc { grid-template-columns: 1fr; }
+    header h1 { font-size: 24px; }
+    .adim { padding: 20px; }
+  }
+
+  .sik-sorulan { margin-top: 40px; }
+  .sik-sorulan h2 {
+    font-size: 21px;
+    margin: 0 0 16px;
+    letter-spacing: -0.2px;
+  }
+  details {
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: "+";
+    display: inline-block;
+    width: 18px;
+    color: var(--vurgu);
+    font-weight: 700;
+  }
+  details[open] summary::before { content: "−"; }
+  details p { margin: 10px 0 0; color: var(--soluk); font-size: 15px; }
+
+  footer {
+    margin-top: 44px;
+    padding-top: 22px;
+    border-top: 1px solid var(--cizgi);
+    color: var(--soluk);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="sinir">
+
+  <header>
+    <h1>Telegram API Alma Rehberi</h1>
+    <p>Uzdem Ders İndirici programının istediği <code style="font-size:15px">api_id</code> ve <code style="font-size:15px">api_hash</code> değerlerini almak için izlemen gereken adımlar.</p>
+    <div class="rozetler">
+      <span class="rozet">~3 dakika</span>
+      <span class="rozet">Ücretsiz</span>
+      <span class="rozet yesil">Kredi kartı gerekmez</span>
+    </div>
+  </header>
+
+  <div class="on-bilgi">
+    <strong>Başlamadan önce</strong>
+    <p>Telegram hesabına kayıtlı telefon numaran hazır olsun. Giriş sırasında bu numaraya kod gönderilecek. Bilgisayardan yapman önerilir — <code>my.telegram.org</code> sitesi mobil tarayıcılarda sorun çıkarabiliyor.</p>
+  </div>
+
+  <!-- ADIM 1 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">1</div>
+      <h2>my.telegram.org adresini aç</h2>
+    </div>
+    <p>Tarayıcıyı aç ve aşağıdaki adrese git:</p>
+    <a class="adres" href="https://my.telegram.org" target="_blank" rel="noopener">my.telegram.org</a>
+    <p>Sayfada <strong>API development tools</strong> bağlantısı göreceksin. Ama önce giriş yapman gerekiyor — o yüzden önce numaranı gir.</p>
+  </div>
+
+  <!-- ADIM 2 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">2</div>
+      <h2>Telefon numaranı gir</h2>
+    </div>
+    <p>Sayfada <strong>Your Phone Number</strong> kutusuna numaranı ülke koduyla yaz. Türkiye için başında <code>+90</code> olacak, boşluk veya tire koyma.</p>
+    <div class="gorsel">
+      Numara böyle görünmeli:
+      <div class="ekran">
+        <div class="satir"><span class="etiket">Your Phone Number:</span><span class="deger">+905551112233</span></div>
+      </div>
+    </div>
+    <p><strong>Next</strong> butonuna bas. Telegram sana bir kod gönderecek.</p>
+  </div>
+
+  <!-- ADIM 3 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">3</div>
+      <h2>Gelen kodu gir</h2>
+    </div>
+    <p>Telegram uygulamandan veya SMS'ten gelen mesaja bak. İçinde 5 haneli bir kod var — örneğin <code>38471</code>. Bu kodu sayfadaki kutuya yaz.</p>
+    <div class="kutu bilgi">
+      <strong>Kod gelmediyse</strong>
+      Birkaç dakika bekle. Hâlâ gelmediyse sayfayı yenileyip tekrar dene. İki adımlı doğrulaman (2FA) açıksa bu adımda ayrıca şifreni de soracaktır.
+    </div>
+    <p>Kodu girdikten sonra <strong>Sign In</strong> butonuna bas. Artık hesabına giriş yapmış olacaksın.</p>
+  </div>
+
+  <!-- ADIM 4 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">4</div>
+      <h2>API development tools bölümüne gir</h2>
+    </div>
+    <p>Giriş yaptıktan sonra karşına bir menü çıkacak. Bu menüde şu başlıkları göreceksin:</p>
+    <ul class="alt">
+      <li>API development tools</li>
+      <li>Telegram API</li>
+      <li>Delete account or manage apps</li>
+    </ul>
+    <p><strong>API development tools</strong> bağlantısına tıkla.</p>
+    <div class="kutu uyari">
+      <strong>Not</strong>
+      Daha önce hiç uygulama oluşturmadıysan burada boş bir form açılır. Daha önce oluşturduysan mevcut uygulamaların listesi çıkar — o zaman 6. adıma geçebilirsin.
+    </div>
+  </div>
+
+  <!-- ADIM 5 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">5</div>
+      <h2>Uygulama formunu doldur</h2>
+    </div>
+    <p>Karşına üç alanlı bir form çıkar. Hepsi basit:</p>
+    <div class="gorsel">
+      Alanlara şunları yaz:
+      <div class="ekran">
+        <div class="satir"><span class="etiket">App title</span><span class="deger">Uzdem</span></div>
+        <div class="satir"><span class="etiket">Short name</span><span class="deger">uzdem</span></div>
+        <div class="satir"><span class="etiket">URL</span><span class="deger">https://example.com</span></div>
+        <div class="satir"><span class="etiket">Platform</span><span class="deger">Desktop</span></div>
+        <div class="satir"><span class="etiket">Description</span><span class="deger">(boş bırakabilirsin)</span></div>
+      </div>
+    </div>
+    <ul class="alt">
+      <li><strong>App title:</strong> Uygulamanın adı. <code>Uzdem</code> yazabilirsin, başka bir isim de olur.</li>
+      <li><strong>Short name:</strong> Kısa isim. Sadece küçük harf ve rakam, en az 5 karakter. <code>uzdem</code> uygundur.</li>
+      <li><strong>URL:</strong> Bir web siten yoksa <code>https://example.com</code> yaz, sorun olmaz.</li>
+      <li><strong>Platform:</strong> Açılır listeden <code>Desktop</code> seç.</li>
+    </ul>
+    <p>Sonra <strong>Create application</strong> butonuna bas.</p>
+  </div>
+
+  <!-- ADIM 6 -->
+  <div class="adim">
+    <div class="adim-baslik">
+      <div class="numara">6</div>
+      <h2>api_id ve api_hash'i kopyala</h2>
+    </div>
+    <p>Formu gönderdikten sonra bir sayfa açılır. Bu sayfada uygulamanın bilgileri listelenir. Aradığın iki değer burada:</p>
+    <div class="sonuc">
+      <div class="sonuc-kutu">
+        <div class="ad">App api_id</div>
+        <div class="veri">32610206</div>
+      </div>
+      <div class="sonuc-kutu">
+        <div class="ad">App api_hash</div>
+        <div class="veri">a76e982e58bcd19d922183c623a9d943</div>
+      </div>
+    </div>
+    <p style="margin-top:16px">Bunlar örnek değerler — sende farklı sayılar ve harfler çıkacak. Kendi değerlerini kopyala.</p>
+    <ul class="alt">
+      <li><strong>api_id</strong> sadece rakamlardan oluşur, genellikle 7-8 hanelidir.</li>
+      <li><strong>api_hash</strong> 32 karakterlik harf ve rakam karışımıdır.</li>
+    </ul>
+    <div class="kutu basari">
+      <strong>Hazırsın</strong>
+      Bu iki değeri Uzdem Ders İndirici programındaki ilgili alanlara yapıştır. Program bunları bir kez ister, sonra hatırlar.
+    </div>
+  </div>
+
+  <!-- SSS -->
+  <div class="sik-sorulan">
+    <h2>Sık sorulanlar</h2>
+
+    <details>
+      <summary>Bu bilgileri vermek güvenli mi?</summary>
+      <p>api_id ve api_hash, Telegram'ın resmi olarak uygulama geliştiricilere verdiği kimlik bilgileridir. Başkasıyla paylaşman gerekmez ve paylaşmaman iyi olur — ama tek başına hesabına giriş yapmaya yetmez, ayrıca telefon doğrulaması gerekir. Uzdem Ders İndirici bu değerleri sadece kendi bilgisayarında saklar.</p>
+    </details>
+
+    <details>
+      <summary>Kod gelmiyor, ne yapmalıyım?</summary>
+      <p>Birkaç dakika bekle. Kod bazen birkaç dakikada gelir. Hâlâ gelmediyse sayfayı yenileyip numaranı tekrar gir. SMS yerine Telegram uygulamasına mesaj olarak da gelebilir — oraya bak.</p>
+    </details>
+
+    <details>
+      <summary>"Short name is already taken" hatası alıyorum</summary>
+      <p>Başka birinin aynı kısa ismi kullandığı anlamına gelir. <code>uzdem</code> yerine <code>uzdem2026</code> veya <code>uzdemindirici</code> gibi bir şey dene.</p>
+    </details>
+
+    <details>
+      <summary>Daha önce API almıştım, tekrar almam gerekiyor mu?</summary>
+      <p>Hayır. API development tools sayfasında mevcut uygulamaların listelenir. Uygulamanın üzerine tıklayıp api_id ve api_hash değerlerini görebilirsin.</p>
+    </details>
+
+    <details>
+      <summary>Bu işlem ücretli mi?</summary>
+      <p>Hayır, tamamen ücretsiz. Telegram API'si ücretsizdir ve kredi kartı bilgisi istemez.</p>
+    </details>
+
+    <details>
+      <summary>Değerleri kaybettim, ne yapabilirim?</summary>
+      <p>my.telegram.org sitesine tekrar giriş yap, API development tools bölümüne git. Oluşturduğun uygulama listede görünecek, üzerine tıkladığında api_id ve api_hash tekrar gösterilir.</p>
+    </details>
+  </div>
+
+  <footer>
+    Bu rehber Uzdem Ders İndirici programı için hazırlanmıştır. Telegram API'si, Telegram FZ LLC tarafından sağlanır.
+  </footer>
+
+</div>
+</body>
+</html>
